@@ -7,3 +7,9 @@ You cloud find it with Mixin ID 7000104341.
 Reach me out via Mixin ID:37351541 for any suggestion or pull request directly for this repo.
 
 Looking forward to meet with you.
+
+## Todo
+
+- [ ] Add total request times throttle killswitch.
+- [ ] Add request times throttle killswithch for individual enduser.
+- [ ] Add trail and paid feature.
