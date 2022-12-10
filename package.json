@@ -1,0 +1,15 @@
+{
+  "name": "chatgpt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mumuwu",
+  "license": "ISC",
+  "dependencies": {
+    "mixin-node-sdk": "2.x",
+    "request": "^2.88.2"
+  }
+}
