@@ -1,4 +1,4 @@
-const { CLIENT_CONFIG, API_KEY } = require('./constants');
+const { CLIENT_CONFIG, API_KEY } = require("./constants");
 
 const request = require("request");
 const { MixinSocket } = require("mixin-node-sdk");
@@ -56,8 +56,6 @@ socketClient.get_message_handler = async function (message) {
   } else {
     await this.send_text("Not text", message);
   }
-
-  // await this.send_text('感谢您的关注，今天的能源已经耗尽了，我们明天再见！Have a good day!', message)
 };
 
 socketClient.start();
