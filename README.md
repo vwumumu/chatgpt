@@ -10,6 +10,6 @@ Looking forward to meet with you.
 
 ## Todo
 
-- [ ] Add total request times throttle killswitch.
+- [x] Add total request times throttle killswitch.
 - [ ] Add request times throttle killswithch for individual enduser.
 - [ ] Add trail and paid feature.
