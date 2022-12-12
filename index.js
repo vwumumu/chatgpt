@@ -48,10 +48,10 @@ socketClient.get_message_handler = async function (message) {
   const user_id = message.data.user_id;
 
   if (!workList.hasOwnProperty(user_id)) {
-    workList[user_id] = 2;
+    workList[user_id] = 10;
     // console.log(workList);
     if (vipList.includes(user_id)) {
-      workList[user_id] = 2;
+      workList[user_id] = 10;
     }
   }
 
