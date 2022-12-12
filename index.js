@@ -11,7 +11,8 @@ const socketClient = new MixinSocket(CLIENT_CONFIG, true, true);
 // Variables
 const MODEL = "text-davinci-003";
 const API_URL = "https://api.openai.com/v1/completions";
-let counter = 3000;
+let counter = 410;
+let requests = 0;
 
 // Message handling
 socketClient.get_message_handler = async function (message) {
@@ -33,6 +34,11 @@ socketClient.get_message_handler = async function (message) {
 
   // Get input
   const TEXT = message.data.parseData;
+  // console.log(TEXT);
+  if (TEXT) {
+    requests += 1;
+    console.log(requests);
+  }
 
   // Handle input
   const options = {
@@ -75,7 +81,7 @@ socketClient.get_message_handler = async function (message) {
     );
   } else {
     await this.send_text(
-      "感谢您的关注，今天的能源已经耗尽了，我们明天再见！Have a good day!",
+      "感谢您的关注，今日查询次数已耗尽，我们明天再见！Have a good day!",
       message
     );
   }
