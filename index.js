@@ -12,11 +12,10 @@ const socketClient = new MixinSocket(CLIENT_CONFIG, true, true);
 // Variables
 const MODEL = "text-davinci-003";
 const API_URL = "https://api.openai.com/v1/completions";
-let counter = 500;
+let counter = 300;
 let requests = 0;
 
 let workList = {};
-// workList = {};
 const vipList = ["cbb20923-9020-490a-b8f6-e816883c9c99"];
 
 // Message handling
@@ -51,7 +50,7 @@ socketClient.get_message_handler = async function (message) {
     workList[user_id] = 10;
     // console.log(workList);
     if (vipList.includes(user_id)) {
-      workList[user_id] = 10;
+      workList[user_id] = 30;
     }
   }
 
@@ -68,7 +67,7 @@ socketClient.get_message_handler = async function (message) {
     json: {
       prompt: TEXT,
       max_tokens: 1024,
-      temperature: 0.5,
+      temperature: 0.6,
       model: MODEL,
       user: message.data.user_id,
     },
@@ -95,19 +94,13 @@ socketClient.get_message_handler = async function (message) {
     console.log("总查询次数剩余：", counter);
     workList[user_id] -= 1;
     this.send_text(
-      "今日您的可用总查询次数还剩余 " + workList[user_id] + " 次。",
+      "今日您的可用总查询次数还剩余: " + workList[user_id] + " 次。",
       message
     );
   } else if (counter === 0) {
-    await this.send_text(
-      "感谢您的关注，机器人总查询次数已耗尽，将在00：00重置，我们明天再见！Have a good day!",
-      message
-    );
+    await this.send_text("机器人总查询次数已耗尽，将在02：00重置。", message);
   } else {
-    await this.send_text(
-      "感谢您的关注，今日您的可用总查询次数已耗尽，将在00：00重置，我们明天再见！Have a good day!",
-      message
-    );
+    await this.send_text("您的可用总查询次数已耗尽，将在02：00重置。", message);
   }
   console.log(user_id, "今日次数已用尽。");
 };
@@ -115,15 +108,16 @@ socketClient.get_message_handler = async function (message) {
 // 设置每天0点重置计数
 setInterval(function () {
   // 获取当前时间
-  var date = new Date();
+  let date = new Date();
   // 如果当前时间是0点
   if (
-    date.getHours() === 0 &&
+    date.getHours() === 2 &&
     date.getMinutes() === 0 &&
     date.getSeconds() === 0
   ) {
     // 重置计数
-    counter = 0;
+    counter = 300;
+    requests = 0;
     workList = {};
     console.log("总可用次数已重置。");
   }
