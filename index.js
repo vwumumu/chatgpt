@@ -4,6 +4,7 @@ const { CLIENT_CONFIG, API_KEY } = require("./constants");
 // Import modules
 const request = require("request");
 const { MixinSocket } = require("mixin-node-sdk");
+const datetime = require("datetime");
 
 // New object
 const socketClient = new MixinSocket(CLIENT_CONFIG, true, true);
@@ -11,8 +12,12 @@ const socketClient = new MixinSocket(CLIENT_CONFIG, true, true);
 // Variables
 const MODEL = "text-davinci-003";
 const API_URL = "https://api.openai.com/v1/completions";
-let counter = 410;
+let counter = 500;
 let requests = 0;
+
+let workList = {};
+// workList = {};
+const vipList = ["cbb20923-9020-490a-b8f6-e816883c9c99"];
 
 // Message handling
 socketClient.get_message_handler = async function (message) {
@@ -32,15 +37,27 @@ socketClient.get_message_handler = async function (message) {
 
   if (message.error) return console.log(message.error);
 
+  // console.log(message);
   // Get input
   const TEXT = message.data.parseData;
-  // console.log(TEXT);
   if (TEXT) {
     requests += 1;
-    console.log(requests);
+    console.log("收到用户查询次数：", requests);
   }
 
-  // Handle input
+  const user_id = message.data.user_id;
+
+  if (!workList.hasOwnProperty(user_id)) {
+    workList[user_id] = 2;
+    // console.log(workList);
+    if (vipList.includes(user_id)) {
+      workList[user_id] = 2;
+    }
+  }
+
+  // console.log(workList);
+
+  // Post input to OpenAI
   const options = {
     method: "POST",
     url: API_URL,
@@ -51,14 +68,14 @@ socketClient.get_message_handler = async function (message) {
     json: {
       prompt: TEXT,
       max_tokens: 1024,
-      temperature: 0.6,
+      temperature: 0.5,
       model: MODEL,
       user: message.data.user_id,
     },
   };
 
   // Request and Output handling
-  if (counter > 0) {
+  if (workList[user_id] > 0 && counter > 0) {
     if (message.data.category === "PLAIN_TEXT") {
       const self = this;
       request(options, function (error, response, body) {
@@ -75,16 +92,41 @@ socketClient.get_message_handler = async function (message) {
       await this.send_text("Not text", message);
     }
     counter -= 1;
+    console.log("总查询次数剩余：", counter);
+    workList[user_id] -= 1;
     this.send_text(
-      "今日我的可用总查询次数还剩余 " + counter + " 次。",
+      "今日您的可用总查询次数还剩余 " + workList[user_id] + " 次。",
+      message
+    );
+  } else if (counter === 0) {
+    await this.send_text(
+      "感谢您的关注，机器人总查询次数已耗尽，将在00：00重置，我们明天再见！Have a good day!",
       message
     );
   } else {
     await this.send_text(
-      "感谢您的关注，今日查询次数已耗尽，我们明天再见！Have a good day!",
+      "感谢您的关注，今日您的可用总查询次数已耗尽，将在00：00重置，我们明天再见！Have a good day!",
       message
     );
   }
+  console.log(user_id, "今日次数已用尽。");
 };
+
+// 设置每天0点重置计数
+setInterval(function () {
+  // 获取当前时间
+  var date = new Date();
+  // 如果当前时间是0点
+  if (
+    date.getHours() === 0 &&
+    date.getMinutes() === 0 &&
+    date.getSeconds() === 0
+  ) {
+    // 重置计数
+    counter = 0;
+    workList = {};
+    console.log("总可用次数已重置。");
+  }
+}, 1000);
 
 socketClient.start();
