@@ -4,13 +4,14 @@ const { CLIENT_CONFIG, API_KEY } = require("./constants");
 // Import modules
 const request = require("request");
 const { MixinSocket } = require("mixin-node-sdk");
-const datetime = require("datetime");
+// const datetime = require("datetime");
 
 // New object
 const socketClient = new MixinSocket(CLIENT_CONFIG, true, true);
 
 // Variables
 const MODEL = "text-davinci-003";
+// const MODEL = "text-curie-001";
 const API_URL = "https://api.openai.com/v1/completions";
 let counter = 300;
 let requests = 0;
@@ -47,10 +48,10 @@ socketClient.get_message_handler = async function (message) {
   const user_id = message.data.user_id;
 
   if (!workList.hasOwnProperty(user_id)) {
-    workList[user_id] = 10;
+    workList[user_id] = 20;
     // console.log(workList);
     if (vipList.includes(user_id)) {
-      workList[user_id] = 30;
+      workList[user_id] = 60;
     }
   }
 
@@ -81,7 +82,8 @@ socketClient.get_message_handler = async function (message) {
         if (!error && response.statusCode == 200) {
           const q = message.data.parseData;
           const a = body.choices[0].text.replace(/\n[\n]+/g, "");
-          const result = "Q: " + q + "\n" + "A: " + a;
+          // const result = "Q: " + q + "\n" + "A: " + a;
+          const result = a + "\n" + "[" + workList[user_id] + "]";
           self.send_text(result, message);
         } else {
           console.error(error);
@@ -93,16 +95,16 @@ socketClient.get_message_handler = async function (message) {
     counter -= 1;
     console.log("总查询次数剩余：", counter);
     workList[user_id] -= 1;
-    this.send_text(
-      "今日您的可用总查询次数还剩余: " + workList[user_id] + " 次。",
-      message
-    );
+    // this.send_text(
+    //   "今日您的可用总查询次数还剩余: " + workList[user_id] + " 次。",
+    //   message
+    // );
   } else if (counter === 0) {
-    await this.send_text("机器人总查询次数已耗尽，将在02：00重置。", message);
+    await this.send_text("机器人总对话次数已用完，将在02：00重置。", message);
   } else {
-    await this.send_text("您的可用总查询次数已耗尽，将在02：00重置。", message);
+    await this.send_text("每天只能和我对话20次，将在02：00重置。", message);
+    console.log(user_id, "今日次数已用尽。");
   }
-  console.log(user_id, "今日次数已用尽。");
 };
 
 // 设置每天0点重置计数
@@ -116,6 +118,8 @@ setInterval(function () {
     date.getSeconds() === 0
   ) {
     // 重置计数
+    console.log("今日用户统计");
+    console.log(workList);
     counter = 300;
     requests = 0;
     workList = {};
