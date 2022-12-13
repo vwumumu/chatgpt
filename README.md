@@ -11,5 +11,7 @@ Looking forward to meet with you.
 ## Todo
 
 - [x] Add total request times throttle killswitch.
-- [ ] Add request times throttle killswithch for individual enduser.
-- [ ] Add trail and paid feature.
+- [x] Add request times throttle killswithch for individual enduser.
+- [x] Add trail and paid feature.
+- [ ] Rebuild data instructure.
+- [ ] Add dead line property.
