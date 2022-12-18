@@ -9,8 +9,8 @@ const config = require("../config.json");
 const client = new BlazeClient(config, { parse: true, syncAck: true });
 
 //global constants
-let totalLimit = 1000;
-let userLimit = 15;
+let totalLimit = 3;
+let userLimit = 2;
 let workList = {};
 
 //ws
@@ -23,7 +23,7 @@ client.loopBlaze({
   },
   onTransfer(msg) {
     // console.log(msg);
-    if (msg.data.asset_id === config.usdt_asset_id && msg.data.amount >= 2.99) {
+    if (msg.data.asset_id === config.cnb_asset_id && msg.data.amount >= 2.99) {
       addLifecycle(msg, 30);
     }
   },
@@ -93,6 +93,7 @@ async function addLifecycle({ user_id }, lifeCycle) {
     }
     console.log("DonateList updated successfully");
   });
+  workList[user_id] = totalLimit;
   await client.sendMessageText(
     user_id,
     `感谢您的支持，您当前的无限制使用天数为：${vipList[user_id]["lifeCycle"]}天。`
@@ -227,7 +228,7 @@ async function handleDonate({ data, user_id }) {
       [
         {
           label: `点击向我打赏`,
-          action: `mixin://pay?asset=${config.usdt_asset_id}&amount=2.99&memo=%E5%90%91%E6%88%91%E6%89%93%E8%B5%8F&recipient=${config.client_id}&trace=${uuid}`,
+          action: `mixin://pay?asset=${config.cnb_asset_id}&amount=2.99&memo=%E5%90%91%E6%88%91%E6%89%93%E8%B5%8F&recipient=${config.client_id}&trace=${uuid}`,
           color: "#FF1493",
         },
       ]
